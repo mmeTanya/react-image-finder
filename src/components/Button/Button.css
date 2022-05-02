@@ -1,0 +1,20 @@
+.button-Load-more {
+  color: white;
+  background-color: #3384a7;
+  border-radius: 4px;
+  border-color: transparent;
+
+  font-weight: 500;
+  font-size: 25px;
+  line-height: 1.62;
+  letter-spacing: 0.03em;
+
+  padding: 6px 22px;
+  margin: 30px auto;
+}
+
+.button-Load-more:hover,
+.button-Load-more:focus {
+  transform: scale(1.03);
+  box-shadow: 8px -6px 16px -2px #8c8c8c;
+}
