@@ -15,7 +15,6 @@ class ImageGallery extends Component {
     status: 'IDLE',
     page: 1,
     error: null,
-    loading: false,
     showModal: false,
     showButton: false,
     activeImage: null,
@@ -23,7 +22,7 @@ class ImageGallery extends Component {
 
   async componentDidUpdate(prevProps, prevState) {
     if (prevProps.query !== this.props.query) {
-      await this.setState({ status: 'PENDING', images: [], page: 1 });
+      await this.setState({ images: [], page: 1 });
       await this.handleRanderPage();
       return;
     }
@@ -31,35 +30,31 @@ class ImageGallery extends Component {
 
   handleRanderPage = async () => {
     try {
-      await this.setState({ loading: true });
+      await this.setState({ status: 'PENDING' });
+
       const data = await FetchImages(this.props.query, this.state.page);
 
       if (data.hits.length !== 0) {
+
+        await this.setState(prevState => ({
+          images: [...prevState.images, ...data.hits],
+          status: 'RESOLVED',
+          showButton: true,
+        }))
+
         if (this.state.page >= Math.ceil(data.totalHits / 12)) {
-          await this.setState(prevState => ({
-            images: [...prevState.images, ...data.hits],
-            status: 'RESOLVED',
-            loading: false,
-            showButton: false,
-          }));
+          await this.setState({ showButton: false });
           toast("We're sorry, but you've reached the end of search results");
-        }
-         else {
-          await this.setState(prevState => ({
-            images: [...prevState.images, ...data.hits],
-            status: 'RESOLVED',
-            loading: false,
-            showButton: true,
-          }));
         }
 
         await scroll.scrollToBottom();
         return;
       }
-      this.setState({ status: 'REJECTED', loading: false });
+      
+      this.setState({ status: 'REJECTED' });
       return;
     } catch (error) {
-      this.setState({ error, status: 'REJECTED', loading: false });
+      this.setState({ error, status: 'REJECTED' });
     }
   };
 
@@ -85,34 +80,30 @@ class ImageGallery extends Component {
   };
 
   render() {
-    const { images, status, loading, showModal, activeImage, showButton } =
-      this.state;
+    const { images, status, showModal, activeImage, showButton } = this.state;
 
     if (status === 'IDLE') {
       return <p className="text">Please, enter the name of a pictures</p>;
     }
 
     if (status === 'PENDING') {
-      return <Loading />;
+      return (
+        <>
+          <ul className="ImageGallery">
+            {images.map(image => (
+              <ImageGalleryItem
+                image={image}
+                key={image.id}
+                onCliked={this.handleOpenModal}
+              />
+            ))}
+          </ul>
+          <Loading />
+        </>
+      );
     }
 
     if (status === 'RESOLVED') {
-      if (loading) {
-        return (
-          <>
-            <ul className="ImageGallery">
-              {images.map(image => (
-                <ImageGalleryItem
-                  image={image}
-                  key={image.id}
-                  onCliked={this.handleOpenModal}
-                />
-              ))}
-            </ul>
-            <Loading />
-          </>
-        );
-      }
       return (
         <>
           <ul className="ImageGallery">
