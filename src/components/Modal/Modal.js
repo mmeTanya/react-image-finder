@@ -27,11 +27,11 @@ class Modal extends Component {
   };
 
   render() {
-    const { largeImageURL, tags } = this.props.modulImage;
+    const { src, alt } = this.props;
     return createPortal(
       <div className="Overlay" onClick={this.handleBackdropClick}>
         <div className="Modal">
-          <img src={largeImageURL} alt={tags} loading="lazy" />
+          <img src={src} alt={alt} loading="lazy" />
         </div>
       </div>,
       modalRoot
@@ -42,9 +42,7 @@ class Modal extends Component {
 export default Modal;
 
 Modal.propTypes = {
-  modulImage: PropTypes.shape({
-    largeImageURL: PropTypes.string.isRequired,
-    tags: PropTypes.string.isRequired,
-  }).isRequired,
+  src: PropTypes.string.isRequired,
+  alt: PropTypes.string.isRequired,
   onClose: PropTypes.func.isRequired,
 };
